@@ -2,6 +2,7 @@ import random
 import requests
 import re
 import configparser
+import pwn
 from bs4 import BeautifulSoup
 from imgurpython import ImgurClient
 import urllib
@@ -78,6 +79,19 @@ def movie():
 		link =  data['href']
 		content += '{}{}'.format(title, link)
 	return content
+	
+def ctf():
+
+	conn = pwn.process(["nc","140.138.155.169","5000"])
+	message = conn.recvline().decode()
+	content += message
+	#answer = sorted(message)
+	#conn.sendline(answer);
+	message = conn.recvline().decode()
+	content += message
+	#print(message)
+
+	return content
 
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -101,6 +115,11 @@ def handle_message(event):
     elif event.message.text == "最新電影":
         a=movie()
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text=a))
+		
+    elif event.message.text == "ctf":
+        a=ctf()
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=a))
+		
 		
     else:
         message = TextSendMessage(text=event.message.text)
