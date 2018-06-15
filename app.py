@@ -72,7 +72,7 @@ def movie():
 	soup = BeautifulSoup(res.text, 'lxml')   
 	content = ""
 	for index , data in enumerate(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a')):
-        if index == 20:
+		if index == 20:
 			return content 
 		title = data.text
 		link =  data['href']
