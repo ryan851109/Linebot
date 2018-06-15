@@ -1,8 +1,10 @@
-import requests 
+import random
+import requests
+import re
+import configparser
 from bs4 import BeautifulSoup
+from imgurpython import ImgurClient
 import urllib
-
-from linebot.models import *
 
 from flask import Flask, request, abort
 
@@ -12,33 +14,19 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
-)
+from linebot.models import *
 
 app = Flask(__name__)
+config = configparser.ConfigParser()
+config.read("config.ini")
 
-# Channel Access Token
-line_bot_api = LineBotApi('ozMuYJFjTwn/fOMSJItnaJ9G8f5/+LyMyjZl0xsIof/BNZSfDa7WGeY8NuENF0Awx8pQTAHkw0wJASsQ4rRE5elMge1NICmJc4q26VBZpIQt19aY2ILJjhy+f94zwaolB1dAxjYJ1CEir1miHAIGaQdB04t89/1O/w1cDnyilFU=')
-# Channel Secret
-handler = WebhookHandler('2e4b72dbcdce8f71b04319ed848ab998')
+# config
+line_bot_api = LineBotApi(config['line_bot']['Channel_Access_Token'])
+handler = WebhookHandler(config['line_bot']['Channel_Secret'])
+client_id = config['imgur_api']['Client_id']
+client_secret = config['imgur_api']['Client_Secret']
+album_id = config['imgur_api']['Album_id']
 
-
-def movie():
-	target_url = 'https://movies.yahoo.com.tw/'
-	rs = requests.session()
-	res = rs.get(target_url, verify=True)
-	res.encoding = 'utf-8'
-	soup = BeautifulSoup(res.text, 'lxml')   
-	content = ""
-	print(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a'))
-	for index , data in enumerate(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a')):
-		if index == 20:
-			return content 
-		title = data.text
-		link =  data['href']
-		content += '{}\n{}\n'.format(title, link)
-	return content
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -59,20 +47,70 @@ def callback():
     return 'OK'
 
 
+def technews():
+    target_url = 'https://technews.tw/'
+    print('Start parsing technews ...')
+    rs = requests.session()
+    res = rs.get(target_url, verify=False)
+    res.encoding = 'utf-8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    content = ""
+
+    for index, data in enumerate(soup.select('article div h1.entry-title a')):
+        if index == 12:
+            return content
+        title = data.text
+        link = data['href']
+        content += '{}\n{}\n\n'.format(title, link)
+    return content
+
+def movie():
+	target_url = 'https://movies.yahoo.com.tw/'
+	rs = requests.session()
+	res = rs.get(target_url, verify=True)
+	res.encoding = 'utf-8'
+	soup = BeautifulSoup(res.text, 'lxml')   
+	content = ""
+	print(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a'))
+	for index , data in enumerate(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a')):
+		if index == 20:
+			return content 
+		title = data.text
+		link =  data['href']
+		content += '{}\n{}\n'.format(title, link)
+	return content
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-	if event.message.text == "最新電影":
-		a=movie()
-		line_bot_api.reply_message(event.reply_token,TextSendMessage(text=a))
-	if event.message.text == "貼圖":
-		message = StickerSendMessage(package_id='1',sticker_id='1')
-		line_bot_api.reply_message(event.reply_token, message)
-	if event.message.text == "youtube":
-		line_bot_api.reply_message(event.reply_token,TextSendMessage(text= 'https://www.youtube.com/watch?v=yFz2g7VyfLY' ))
-    
+    message = ""
+    print("event.reply_token:", event.reply_token)
+    print("event.message.text:", event.message.text)
+
+    if event.message.text == "corgi" or event.message.text == "柯基":
+        client = ImgurClient(client_id, client_secret)
+        album = client.get_account_albums(album_id)
+        images = client.get_album_images(album[0].id)
+        index = random.randint(0, len(images) - 1)
+        url = images[index].link
+        message = ImageSendMessage(original_content_url=url, preview_image_url=url)
+
+    elif event.message.text == "news":
+        content = technews()
+        message = TextSendMessage(text=content)
+		
+    elif event.message.text == "最新電影":
+        a=movie()
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text=a))
+		
+    else:
+        message = TextSendMessage(text=event.message.text)
+
+    line_bot_api.reply_message(event.reply_token, message)
+
+
 import os
+
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-
-
