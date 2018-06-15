@@ -44,13 +44,14 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-	#line_bot_api.reply_message(event.reply_token,TextSendMessage(text="movie"))
-	#if event.message.text == "最新電影":
-	#	a=movie()
-	#	line_bot_api.reply_message(event.reply_token,TextSendMessage(text="movie"))
-    #message = StickerSendMessage(package_id='1',sticker_id='1')
-    #line_bot_api.reply_message(event.reply_token, message)
-	line_bot_api.reply_message(event.reply_token,TextSendMessage(text= 'https://www.youtube.com/watch?v=yFz2g7VyfLY' ))
+	if event.message.text == "最新電影":
+		a=movie()
+		line_bot_api.reply_message(event.reply_token,TextSendMessage(text="movie"))
+	if event.message.text == "貼圖":
+		message = StickerSendMessage(package_id='1',sticker_id='1')
+		line_bot_api.reply_message(event.reply_token, message)
+	if event.message.text == "youtube":
+		line_bot_api.reply_message(event.reply_token,TextSendMessage(text= 'https://www.youtube.com/watch?v=yFz2g7VyfLY' ))
     
 import os
 if __name__ == "__main__":
