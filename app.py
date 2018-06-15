@@ -46,7 +46,7 @@ def callback():
 def handle_message(event):
 	if event.message.text == "最新電影":
 		a=movie()
-		line_bot_api.reply_message(event.reply_token,TextSendMessage(text="movie"))
+		line_bot_api.reply_message(event.reply_token,TextSendMessage(text=a))
 	if event.message.text == "貼圖":
 		message = StickerSendMessage(package_id='1',sticker_id='1')
 		line_bot_api.reply_message(event.reply_token, message)
