@@ -83,10 +83,17 @@ def movie():
 def ctf():
 
 	conn = pwn.process(["nc","140.138.155.169","5000"])
-	message = conn.recvline().decode()
+	message = conn.recvline()
 	content += message
-	answer = sorted(message)
-	conn.sendline(answer);
+	#print(message)
+	message = conn.recvline()
+	content += message
+	#print(message)
+	number = message[1:-2].split(',')
+	for i in range(2):
+		number[i] = int(number[i])
+	answer = sorted(number)
+	conn.sendline(str(answer)[1:-1]);
 	message = conn.recvline().decode()
 	content += message
 	#print(message)
