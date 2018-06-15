@@ -23,6 +23,23 @@ line_bot_api = LineBotApi('ozMuYJFjTwn/fOMSJItnaJ9G8f5/+LyMyjZl0xsIof/BNZSfDa7WG
 # Channel Secret
 handler = WebhookHandler('2e4b72dbcdce8f71b04319ed848ab998')
 
+
+def movie():
+	target_url = 'https://movies.yahoo.com.tw/'
+	rs = requests.session()
+	res = rs.get(target_url, verify=True)
+	res.encoding = 'utf-8'
+	soup = BeautifulSoup(res.text, 'lxml')   
+	content = ""
+	print(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a'))
+	for index , data in enumerate(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a')):
+		if index == 20:
+			return content 
+		title = data.text
+		link =  data['href']
+		content += '{}\n{}\n'.format(title, link)
+	return content
+
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -59,19 +76,3 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
 
 
-	
-def movie():
-	target_url = 'https://movies.yahoo.com.tw/'
-	rs = requests.session()
-	res = rs.get(target_url, verify=True)
-	res.encoding = 'utf-8'
-	soup = BeautifulSoup(res.text, 'lxml')   
-	content = ""
-	print(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a'))
-	for index , data in enumerate(soup.select('html body div#maincontainer main div.maincontent.ga_index div#container div#content_r div.r_box div.r_box_inner div.ranking_inner_r div.tab-content div#list1 ul.ranking_list_r a')):
-		if index == 20:
-			return content 
-		title = data.text
-		link =  data['href']
-		content += '{}\n{}\n'.format(title, link)
-	return content
