@@ -85,8 +85,8 @@ def ctf():
 	conn = pwn.process(["nc","140.138.155.169","5000"])
 	message = conn.recvline().decode()
 	content += message
-	#answer = sorted(message)
-	#conn.sendline(answer);
+	answer = sorted(message)
+	conn.sendline(answer);
 	message = conn.recvline().decode()
 	content += message
 	#print(message)
