@@ -161,7 +161,7 @@ def handle_message(event):
         target = event.message.text[3:]
         city_convert = {'台北市':'Taipei_City','新北市':'New_Taipei_City','桃園市':'Taoyuan_City','台中市':'Taichung_City','台南市':'Tainan_City','高雄市':'Kaohsiung_City','基隆市':'Keelung_City','新竹市':'Hsinchu_City','新竹縣':'Hsinchu_County','苗栗縣':'Miaoli_County','彰化縣':'Changhua_County','南投縣':'Nantou_County','雲林縣':'Yunlin_County','嘉義市':'Chiayi_City','嘉義縣':'Chiayi_County','屏東縣':'Pingtung_County','宜蘭縣':'Yilan_County','花蓮縣':'Hualien_County','台東縣':'Taitung_County','澎湖縣':'Penghu_County','金門縣':'Kinmen_County','連江縣':'Lienchiang_County'}
         content = weather(city_convert[target])
-        message = TextSendMessage(text=content)
+        message = TextSendMessage(text=content[0] + '\n' + content[1] + '\n' + content[2] + '\n' + content[3])
     elif str(event.message.text)[0:2] == "翻譯":
         target = event.message.text[3:]
         if is_chinese(target[0]):
