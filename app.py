@@ -127,21 +127,21 @@ def movie():
     return content
 	
 def weather(City):
-    target_url = 'https://www.cwb.gov.tw/V7/forecast/taiwan/%s.htm' %City
-	rs = requests.session()
-	res = rs.get(target_url, verify=True)
-	res.encoding = 'utf-8'
-	soup = BeautifulSoup(res.text, 'lxml')   
-	content = ['溫度(攝氏) : ','天氣狀況 : ','舒適度 : ','降雨機率(%) : '] 
-	for index,data in enumerate(soup.select('table.FcstBoxTable01 tbody tr td')):
-		if index < 4:
-			try :
-				title = data.find('img')
-				title = title['title']
-			except :
-				title = data.text
-			content[index] += '{}'.format(title)
-	return content
+        target_url = 'https://www.cwb.gov.tw/V7/forecast/taiwan/%s.htm' %City
+        rs = requests.session()
+        res = rs.get(target_url, verify=True)
+        res.encoding = 'utf-8'
+        soup = BeautifulSoup(res.text, 'lxml')   
+        content = ['溫度(攝氏) : ','天氣狀況 : ','舒適度 : ','降雨機率(%) : '] 
+        for index,data in enumerate(soup.select('table.FcstBoxTable01 tbody tr td')):
+                if index < 4:
+                        try :
+                                title = data.find('img')
+                                title = title['title']
+                        except :
+                                title = data.text
+                                content[index] += '{}'.format(title)
+        return content
 
 
 @handler.add(MessageEvent, message=TextMessage)
