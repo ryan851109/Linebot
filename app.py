@@ -131,12 +131,12 @@ def weather(City):
         rs = requests.session()
         res = rs.get(target_url, verify=True)
         res.encoding = 'utf-8'
-        soup = BeautifulSoup(res.text, 'lxml')   
+        soup = BeautifulSoup(res.text, 'html.parser')   
         content = ['溫度(攝氏) : ','天氣狀況 : ','舒適度 : ','降雨機率(%) : '] 
         for index,data in enumerate(soup.select('table.FcstBoxTable01 tbody tr td')):
                 if index < 4:
                         try :
-                                title = data.text.find('img')['title']
+                                title = data.find('img')['title']
                         except :
                                 title = data.text
                                 content[index] += '{}'.format(title)
