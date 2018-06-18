@@ -138,7 +138,7 @@ def weather(City):
 			try :
 				title = data('img')['title'] + "img"
 			except :
-				title = data.text
+				title = data#.text
 				content[index] += '{}'.format(title)
 	return content
 
