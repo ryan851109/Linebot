@@ -136,9 +136,9 @@ def weather(City):
 	for index,data in enumerate(soup.select('table.FcstBoxTable01 tbody tr td')):
 		if index < 4:
 			try :
-				title = data.find('td img')['title'].text
+				title = data.find('title')
 			except :
-				title = data#.text
+				title = data.text
 				content[index] += '{}'.format(title)
 	return content
 
